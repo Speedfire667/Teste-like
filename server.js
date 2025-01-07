@@ -9,14 +9,14 @@ const io = new Server(server);
 let likes = 0; // Contador de likes
 
 // Servir arquivos estáticos
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 
 // Rota principal
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
-// Socket.io para comunicação em tempo real
+// Comunicação em tempo real
 io.on('connection', (socket) => {
     console.log('Usuário conectado');
 
