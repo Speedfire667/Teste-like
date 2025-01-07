@@ -10,8 +10,8 @@ app.use(bodyParser.json());
 let likeCount = 0;
 
 const bot = mineflayer.createBot({
-    host: 'localhost', // Endereço do servidor Minecraft
-    port: 25565,       // Porta do servidor Minecraft
+    host: 'BYTEServer.aternos.me', // Endereço do servidor Minecraft
+    port: 12444,       // Porta do servidor Minecraft
     username: 'BotName' // Nome do bot no Minecraft
 });
 
