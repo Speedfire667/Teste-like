@@ -1,18 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador de Likes</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Contador de Likes do YouTube</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c34;
+            color: #fff;
+        }
+        .like-counter {
+            text-align: center;
+            padding: 30px;
+            background-color: #20232a;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+            width: 100%;
+        }
+        .like-counter h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .like-counter p {
+            font-size: 48px;
+            margin: 10px 0;
+        }
+        .like-counter button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #61dafb;
+            color: #20232a;
+            transition: background-color 0.3s;
+        }
+        .like-counter button:hover {
+            background-color: #21a1f1;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>💖 Likes na Live 💖</h1>
-        <div id="likes-count">0</div>
-        <button id="like-button">Curtir 👍</button>
+    <div class="like-counter">
+        <h2>Contador de Likes</h2>
+        <p id="likes">0</p>
+        <button id="like-btn">Curtir</button>
+        <p id="already-liked" style="display: none; color: #21a1f1;">Você já deu um like!</p>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+        const likeBtn = document.querySelector('#like-btn');
+        const likes = document.querySelector('#likes');
+        const alreadyLikedMsg = document.querySelector('#already-liked');
+
+        let count = localStorage.getItem('likeCount') ? parseInt(localStorage.getItem('likeCount')) : 0;
+        likes.textContent = count;
+
+        let hasLiked = localStorage.getItem('hasLiked') ? localStorage.getItem('hasLiked') : 'false';
+
+        if (hasLiked === 'true') {
+            likeBtn.disabled = true;
+            alreadyLikedMsg.style.display = 'block';
+        }
+
+        likeBtn.addEventListener('click', () => {
+            if (hasLiked === 'false') {
+                count++;
+                likes.textContent = count;
+                localStorage.setItem('likeCount', count);
+                localStorage.setItem('hasLiked', 'true');
+                likeBtn.disabled = true;
+                alreadyLikedMsg.style.display = 'block';
+                
+                // Envia a contagem de likes para o servidor
+                fetch('http://seu-servidor.com/updateLikes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ likes: count })
+                });
+            }
+        });
+    </script>
 </body>
 </html>
