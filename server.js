@@ -1,41 +1,34 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
+const bodyParser = require('body-parser');
+const mineflayer = require('mineflayer');
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const port = 3000;
 
-let likes = 0; // Contador de likes
+app.use(bodyParser.json());
 
-// Servir arquivos estáticos
-app.use(express.static(__dirname));
+let likeCount = 0;
 
-// Rota principal
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+const bot = mineflayer.createBot({
+    host: 'localhost', // Endereço do servidor Minecraft
+    port: 25565,       // Porta do servidor Minecraft
+    username: 'BotName' // Nome do bot no Minecraft
 });
 
-// Comunicação em tempo real
-io.on('connection', (socket) => {
-    console.log('Usuário conectado');
-
-    // Enviar o número atual de likes
-    socket.emit('updateLikes', likes);
-
-    // Incrementar o contador de likes
-    socket.on('like', () => {
-        likes++;
-        io.emit('updateLikes', likes); // Atualizar todos os clientes
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Usuário desconectado');
-    });
+bot.on('login', () => {
+    console.log('Bot logado no servidor de Minecraft');
 });
 
-// Inicializar servidor
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+app.post('/updateLikes', (req, res) => {
+    likeCount = req.body.likes;
+    console.log(`Likes atualizados: ${likeCount}`);
+    
+    // Coloca uma TNT perto do jogador e faz ela explodir
+    bot.chat('/summon minecraft:tnt ~ ~ ~ {Fuse:40}'); // A TNT explodirá em 2 segundos (40 ticks)
+    
+    res.sendStatus(200);
+});
+
+app.listen(port, () => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
 });
